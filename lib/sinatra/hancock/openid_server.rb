@@ -34,6 +34,24 @@ module Sinatra
       def self.registered(app)
         app.disable :show_exceptions
         app.send(:include, Sinatra::Hancock::OpenIDServer::Helpers)
+        
+        app.template(:yadis) { openid_server_template('yadis') }        
+        
+        app.get '/sso/xrds' do
+          response.headers['Content-Type'] = 'application/xrds+xml'
+          @types = [ OpenID::OPENID_IDP_2_0_TYPE ]
+          erb :yadis, :layout => false
+        end
+        
+        app.get '/sso/users/:id' do
+          @types = [ OpenID::OPENID_2_0_TYPE, OpenID::SREG_URI ]
+          response.headers['Content-Type'] = 'application/xrds+xml'
+          response.headers['X-XRDS-Location'] = absolute_url("/sso/users/#{params['id']}")
+          
+          erb :yadis, :layout => false
+        end
+        
+        
 
         [:get, :post].each do |meth|
           app.send(meth, '/sso') do
