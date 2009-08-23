@@ -1,6 +1,10 @@
 module Sinatra
   module Hancock
     module OpenIDServer
+      def self.openid_server_template(file, suffix = 'erb')
+        template = File.expand_path(File.dirname(__FILE__)+'/views/openid_server')
+        File.read("#{template}/#{file}.#{suffix}")
+      end      
       module Helpers
         def server
           if @server.nil?
